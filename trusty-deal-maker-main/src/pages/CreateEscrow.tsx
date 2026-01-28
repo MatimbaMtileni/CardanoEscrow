@@ -28,11 +28,21 @@ import { lucidService, adaToLovelace, generateMockTxHash } from '@/services/luci
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
+// Validate both bech32 (addr1...) and hex-encoded addresses from CIP-30 wallets
+const isValidCardanoAddress = (address: string): boolean => {
+  // Bech32 mainnet/testnet format
+  if (/^addr1[a-z0-9]{50,}$/i.test(address)) return true;
+  if (/^addr_test1[a-z0-9]{50,}$/i.test(address)) return true;
+  // Hex-encoded address (from CIP-30 wallets) - typically 114+ hex chars
+  if (/^[0-9a-fA-F]{56,}$/.test(address)) return true;
+  return false;
+};
+
 const formSchema = z.object({
   sellerAddress: z
     .string()
     .min(1, 'Seller address is required')
-    .regex(/^addr1[a-z0-9]{50,}$/, 'Invalid Cardano address format'),
+    .refine(isValidCardanoAddress, 'Invalid Cardano address format'),
   amount: z
     .number({ invalid_type_error: 'Amount is required' })
     .min(10, 'Minimum amount is 10 ADA')
@@ -66,11 +76,12 @@ export const CreateEscrow: React.FC = () => {
   const onSubmit = async (values: FormValues) => {
     if (!wallet || !user) return;
 
+    // Validate against actual wallet balance
     if (values.amount > wallet.balance) {
       toast({
         variant: 'destructive',
         title: 'Insufficient balance',
-        description: `You need ${values.amount} ADA but only have ${wallet.balance} ADA`,
+        description: `You need ${values.amount} ADA but only have ${wallet.balance.toFixed(2)} ADA in your wallet`,
       });
       return;
     }
@@ -78,6 +89,20 @@ export const CreateEscrow: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // Refresh balance first to get accurate wallet state
+      await refreshBalance();
+      
+      // Re-check balance after refresh
+      if (values.amount > wallet.balance) {
+        toast({
+          variant: 'destructive',
+          title: 'Insufficient balance',
+          description: `You need ${values.amount} ADA but only have ${wallet.balance.toFixed(2)} ADA in your wallet`,
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       let txHash: string;
 
       // Try to use Lucid for real blockchain transaction
@@ -102,7 +127,7 @@ export const CreateEscrow: React.FC = () => {
         tx_hash: txHash,
       });
       
-      // Refresh balance after transaction
+      // Refresh balance after transaction to reflect locked funds
       await refreshBalance();
 
       setCreatedEscrowId(escrow.id);
