@@ -1,11 +1,17 @@
+<<<<<<< HEAD
 // Cardano Escrow Service - Real Blockfrost integration for Preprod testnet
 // Uses edge function for Blockfrost API calls and CIP-30 wallet for signing
 
 import { supabase } from '@/integrations/supabase/client';
+=======
+// Cardano Escrow Service - Mock implementation for browser compatibility
+// Real Lucid integration requires a Node.js environment or proper WASM setup
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
 
 export interface LucidConfig {
   network: 'Mainnet' | 'Preprod' | 'Preview';
   blockfrostApiKey?: string;
+<<<<<<< HEAD
   blockfrostUrl?: string;
 }
 
@@ -15,6 +21,10 @@ export const PREPROD_CONFIG: LucidConfig = {
   blockfrostUrl: 'https://cardano-preprod.blockfrost.io/api/v0',
 };
 
+=======
+}
+
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
 export interface EscrowParams {
   sellerAddress: string;
   amount: bigint; // in Lovelace
@@ -35,6 +45,7 @@ export interface EscrowDatum {
   deadline: bigint;
 }
 
+<<<<<<< HEAD
 // CIP-30 Extended Wallet API for signing
 interface CIP30WalletApi {
   getNetworkId(): Promise<number>;
@@ -78,10 +89,22 @@ class LucidService {
   async initialize(config: LucidConfig): Promise<void> {
     console.log(`[LucidService] Initializing for ${config.network}...`);
     this.network = config.network;
+=======
+class LucidService {
+  private initialized = false;
+  private scriptAddress: string | null = null;
+  private scriptCbor: string | null = null;
+  private connectedAddress: string | null = null;
+
+  async initialize(config: LucidConfig): Promise<void> {
+    // In a real implementation, this would initialize Lucid with Blockfrost
+    console.log(`[LucidService] Initializing for ${config.network}...`);
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
     this.initialized = true;
   }
 
   async connectWallet(walletApi: unknown): Promise<string> {
+<<<<<<< HEAD
     this.walletApi = walletApi as CIP30WalletApi;
     
     try {
@@ -148,12 +171,51 @@ class LucidService {
       throw new Error('Wallet not connected');
     }
 
+=======
+    if (!this.initialized) {
+      console.warn('[LucidService] Not initialized, using mock connection');
+    }
+    
+    // Extract address from CIP-30 wallet API
+    try {
+      const api = walletApi as { getUsedAddresses?: () => Promise<string[]> };
+      if (api.getUsedAddresses) {
+        const addresses = await api.getUsedAddresses();
+        if (addresses.length > 0) {
+          // Convert from hex to bech32 would happen here with real Lucid
+          this.connectedAddress = addresses[0];
+          return this.connectedAddress;
+        }
+      }
+    } catch (error) {
+      console.error('[LucidService] Wallet connection error:', error);
+    }
+    
+    // Fallback mock address
+    this.connectedAddress = 'addr1_mock_' + generateMockTxHash().slice(0, 40);
+    return this.connectedAddress;
+  }
+
+  setScriptAddress(address: string, cbor: string): void {
+    this.scriptAddress = address;
+    this.scriptCbor = cbor;
+    console.log('[LucidService] Script configured:', { address: address.slice(0, 20) + '...' });
+  }
+
+  async createEscrow(params: EscrowParams): Promise<string> {
+    if (!this.scriptAddress) {
+      console.warn('[LucidService] No script configured, using simulation');
+    }
+
+    // Simulate transaction building and signing
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
     console.log('[LucidService] Creating escrow:', {
       seller: params.sellerAddress.slice(0, 20) + '...',
       amount: `${Number(params.amount) / 1_000_000} ADA`,
       deadline: params.deadline.toISOString(),
     });
 
+<<<<<<< HEAD
     try {
       // For a full implementation, we would need to:
       // 1. Build the transaction with proper CBOR encoding
@@ -221,10 +283,22 @@ class LucidService {
   async releaseEscrow(utxo: UTxO): Promise<string> {
     if (!this.walletApi) {
       throw new Error('Wallet not connected');
+=======
+    // In real implementation: build tx, sign, submit
+    await simulateDelay(500);
+    
+    return generateMockTxHash();
+  }
+
+  async releaseEscrow(utxo: UTxO): Promise<string> {
+    if (!this.scriptCbor) {
+      console.warn('[LucidService] No script CBOR configured');
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
     }
 
     console.log('[LucidService] Releasing escrow UTxO:', utxo.txHash.slice(0, 16) + '...');
     
+<<<<<<< HEAD
     // Similar to createEscrow, full implementation requires:
     // 1. Building a transaction that spends the script UTxO
     // 2. Including the "Release" redeemer
@@ -238,10 +312,22 @@ class LucidService {
   async refundEscrow(utxo: UTxO): Promise<string> {
     if (!this.walletApi) {
       throw new Error('Wallet not connected');
+=======
+    // Simulate release transaction
+    await simulateDelay(500);
+    
+    return generateMockTxHash();
+  }
+
+  async refundEscrow(utxo: UTxO): Promise<string> {
+    if (!this.scriptCbor) {
+      console.warn('[LucidService] No script CBOR configured');
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
     }
 
     console.log('[LucidService] Refunding escrow UTxO:', utxo.txHash.slice(0, 16) + '...');
     
+<<<<<<< HEAD
     throw new Error(
       'Refund transaction requires Cardano serialization libraries for script interaction.'
     );
@@ -279,12 +365,33 @@ class LucidService {
   getScriptUtxos(): Promise<UTxO[]> {
     // Would query UTxOs at the script address
     return Promise.resolve([]);
+=======
+    // Simulate refund transaction
+    await simulateDelay(500);
+    
+    return generateMockTxHash();
+  }
+
+  async getScriptUtxos(): Promise<UTxO[]> {
+    if (!this.scriptAddress) {
+      return [];
+    }
+
+    // In real implementation: query Blockfrost for UTxOs at script address
+    return [];
+  }
+
+  async getWalletBalance(): Promise<bigint> {
+    // In real implementation: sum UTxOs from wallet
+    return 0n;
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
   }
 
   isInitialized(): boolean {
     return this.initialized;
   }
 
+<<<<<<< HEAD
   getConnectedAddress(): string | null {
     return this.connectedAddress;
   }
@@ -305,6 +412,15 @@ class LucidService {
         return `https://preprod.cardanoscan.io/transaction/${txHash}`;
     }
   }
+=======
+  hasScriptConfigured(): boolean {
+    return this.scriptAddress !== null && this.scriptCbor !== null;
+  }
+
+  getConnectedAddress(): string | null {
+    return this.connectedAddress;
+  }
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
 }
 
 export const lucidService = new LucidService();
@@ -315,7 +431,11 @@ export const adaToLovelace = (ada: number): bigint => BigInt(Math.floor(ada * 1_
 // Helper to convert Lovelace to ADA
 export const lovelaceToAda = (lovelace: bigint): number => Number(lovelace) / 1_000_000;
 
+<<<<<<< HEAD
 // Generate a mock tx hash for simulation (keeping for compatibility)
+=======
+// Generate a mock tx hash for simulation
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
 export const generateMockTxHash = (): string => {
   const chars = 'abcdef0123456789';
   let hash = '';
@@ -324,3 +444,10 @@ export const generateMockTxHash = (): string => {
   }
   return hash;
 };
+<<<<<<< HEAD
+=======
+
+// Simulate network delay
+const simulateDelay = (ms: number): Promise<void> => 
+  new Promise(resolve => setTimeout(resolve, ms));
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440

@@ -12,9 +12,12 @@ dist
 dist-ssr
 *.local
 
+<<<<<<< HEAD
 # Local env files
 supabase/functions/send-notification/.env
 
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

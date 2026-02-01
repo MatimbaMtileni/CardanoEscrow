@@ -6,6 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+<<<<<<< HEAD
 // Safe error messages - never expose internal details
 const SAFE_ERRORS = {
   UNAUTHORIZED: "Unauthorized",
@@ -69,6 +70,8 @@ function sanitizeDbError(error: { code?: string; message?: string }): string {
   return SAFE_ERRORS.SERVER_ERROR;
 }
 
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
 interface CreateEscrowRequest {
   action: "create";
   buyer_address: string;
@@ -97,7 +100,11 @@ serve(async (req: Request): Promise<Response> => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(
+<<<<<<< HEAD
         JSON.stringify({ error: SAFE_ERRORS.UNAUTHORIZED }),
+=======
+        JSON.stringify({ error: "Unauthorized" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -110,15 +117,24 @@ serve(async (req: Request): Promise<Response> => {
 
     // Verify user
     const token = authHeader.replace("Bearer ", "");
+<<<<<<< HEAD
     const { data: authData, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !authData?.user) {
       return new Response(
         JSON.stringify({ error: SAFE_ERRORS.UNAUTHORIZED }),
+=======
+    const { data: authData, error: authError } = await supabase.auth.getClaims(token);
+    
+    if (authError || !authData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+<<<<<<< HEAD
     const userId = authData.user.id;
     const body: EscrowRequest = await req.json();
 
@@ -170,6 +186,19 @@ serve(async (req: Request): Promise<Response> => {
       if (description && description.length > 500) {
         return new Response(
           JSON.stringify({ error: SAFE_ERRORS.DESCRIPTION_TOO_LONG }),
+=======
+    const userId = authData.claims.sub;
+    const body: EscrowRequest = await req.json();
+
+    if (body.action === "create") {
+      // Create new escrow
+      const { buyer_address, seller_address, amount, deadline, description, tx_hash } = body as CreateEscrowRequest;
+
+      // Validate required fields
+      if (!buyer_address || !seller_address || !amount || !deadline || !tx_hash) {
+        return new Response(
+          JSON.stringify({ error: "Missing required fields" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -182,7 +211,11 @@ serve(async (req: Request): Promise<Response> => {
           seller_address,
           amount,
           deadline,
+<<<<<<< HEAD
           description: description?.substring(0, 500), // Enforce limit
+=======
+          description,
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           buyer_user_id: userId,
           status: "active",
         })
@@ -192,7 +225,11 @@ serve(async (req: Request): Promise<Response> => {
       if (escrowError) {
         console.error("Escrow creation error:", escrowError);
         return new Response(
+<<<<<<< HEAD
           JSON.stringify({ error: sanitizeDbError(escrowError) }),
+=======
+          JSON.stringify({ error: escrowError.message }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -212,7 +249,10 @@ serve(async (req: Request): Promise<Response> => {
 
       if (txError) {
         console.error("Transaction creation error:", txError);
+<<<<<<< HEAD
         // Don't fail the whole request, escrow was created
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
       }
 
       return new Response(
@@ -226,6 +266,7 @@ serve(async (req: Request): Promise<Response> => {
 
       if (!escrow_id || !tx_hash) {
         return new Response(
+<<<<<<< HEAD
           JSON.stringify({ error: SAFE_ERRORS.MISSING_FIELDS }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
@@ -235,6 +276,9 @@ serve(async (req: Request): Promise<Response> => {
       if (!isValidTxHash(tx_hash)) {
         return new Response(
           JSON.stringify({ error: SAFE_ERRORS.INVALID_TX_HASH }),
+=======
+          JSON.stringify({ error: "Missing escrow_id or tx_hash" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -248,11 +292,16 @@ serve(async (req: Request): Promise<Response> => {
 
       if (fetchError || !escrow) {
         return new Response(
+<<<<<<< HEAD
           JSON.stringify({ error: SAFE_ERRORS.ESCROW_NOT_FOUND }),
+=======
+          JSON.stringify({ error: "Escrow not found" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
+<<<<<<< HEAD
       // Verify user is the buyer (only buyer can release or refund)
       // This is intentional - in a blockchain escrow, the buyer holds the power
       // to release funds to seller or reclaim after deadline
@@ -264,26 +313,46 @@ serve(async (req: Request): Promise<Response> => {
           : SAFE_ERRORS.ONLY_BUYER_REFUND;
         return new Response(
           JSON.stringify({ error: errorMessage }),
+=======
+      // Verify user is the buyer
+      if (escrow.buyer_user_id !== userId) {
+        return new Response(
+          JSON.stringify({ error: "Only buyer can perform this action" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
       if (escrow.status !== "active") {
         return new Response(
+<<<<<<< HEAD
           JSON.stringify({ error: SAFE_ERRORS.ESCROW_NOT_ACTIVE }),
+=======
+          JSON.stringify({ error: "Escrow is not active" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
+<<<<<<< HEAD
       // For refund, check deadline has passed
+=======
+      // For refund, check deadline
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
       if (body.action === "refund") {
         const now = new Date();
         const deadline = new Date(escrow.deadline);
         if (now < deadline) {
           return new Response(
+<<<<<<< HEAD
             JSON.stringify({ error: SAFE_ERRORS.REFUND_DEADLINE_NOT_PASSED }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
+=======
+            JSON.stringify({ error: "Cannot refund before deadline" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
         }
       }
 
@@ -302,7 +371,11 @@ serve(async (req: Request): Promise<Response> => {
       if (updateError) {
         console.error("Escrow update error:", updateError);
         return new Response(
+<<<<<<< HEAD
           JSON.stringify({ error: sanitizeDbError(updateError) }),
+=======
+          JSON.stringify({ error: updateError.message }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -332,14 +405,24 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     return new Response(
+<<<<<<< HEAD
       JSON.stringify({ error: SAFE_ERRORS.INVALID_ACTION }),
+=======
+      JSON.stringify({ error: "Invalid action" }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: unknown) {
     console.error("Edge function error:", error);
+<<<<<<< HEAD
     // Never expose internal error details to client
     return new Response(
       JSON.stringify({ error: SAFE_ERRORS.SERVER_ERROR }),
+=======
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return new Response(
+      JSON.stringify({ error: message }),
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

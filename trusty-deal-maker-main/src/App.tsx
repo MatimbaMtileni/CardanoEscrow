@@ -10,7 +10,10 @@ import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import CreateEscrow from "./pages/CreateEscrow";
 import EscrowDetail from "./pages/EscrowDetail";
+<<<<<<< HEAD
 import Analytics from "./pages/Analytics";
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -31,7 +34,10 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/create" element={<CreateEscrow />} />
               <Route path="/escrow/:id" element={<EscrowDetail />} />
+<<<<<<< HEAD
               <Route path="/analytics" element={<Analytics />} />
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

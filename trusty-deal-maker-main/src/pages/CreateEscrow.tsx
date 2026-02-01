@@ -106,7 +106,11 @@ export const CreateEscrow: React.FC = () => {
       let txHash: string;
 
       // Try to use Lucid for real blockchain transaction
+<<<<<<< HEAD
       if (lucidService.isInitialized()) {
+=======
+      if (lucidService.isInitialized() && lucidService.hasScriptConfigured()) {
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
         txHash = await lucidService.createEscrow({
           sellerAddress: values.sellerAddress,
           amount: adaToLovelace(values.amount),

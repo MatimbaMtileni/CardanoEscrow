@@ -14,6 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
+<<<<<<< HEAD
       escrow_attachments: {
         Row: {
           created_at: string
@@ -87,6 +88,8 @@ export type Database = {
           },
         ]
       }
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
       escrow_transactions: {
         Row: {
           amount: number
@@ -143,7 +146,10 @@ export type Database = {
           seller_user_id: string | null
           status: Database["public"]["Enums"]["escrow_status"]
           updated_at: string
+<<<<<<< HEAD
           view_count: number | null
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
         }
         Insert: {
           amount: number
@@ -159,7 +165,10 @@ export type Database = {
           seller_user_id?: string | null
           status?: Database["public"]["Enums"]["escrow_status"]
           updated_at?: string
+<<<<<<< HEAD
           view_count?: number | null
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
         }
         Update: {
           amount?: number
@@ -175,7 +184,10 @@ export type Database = {
           seller_user_id?: string | null
           status?: Database["public"]["Enums"]["escrow_status"]
           updated_at?: string
+<<<<<<< HEAD
           view_count?: number | null
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
         }
         Relationships: []
       }

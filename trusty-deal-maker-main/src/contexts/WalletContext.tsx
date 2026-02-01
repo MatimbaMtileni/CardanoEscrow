@@ -120,6 +120,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setWallet(info);
       localStorage.setItem(WALLET_STORAGE_KEY, walletName);
 
+<<<<<<< HEAD
       // If the user is authenticated with Supabase, link wallet to their profile
       try {
         // Dynamically import to avoid circular dependency during module load
@@ -130,6 +131,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.debug('Could not update profile wallet:', err);
       }
 
+=======
+>>>>>>> 616a906c5d47900c9f5f637284227e649a880440
       const networkName = networkId === 1 ? 'Mainnet' : 'Testnet';
       toast.success(`Connected to ${walletName}`, {
         description: `Network: ${networkName} | Balance: ${balanceAda.toLocaleString()} ₳`,
