@@ -134,7 +134,7 @@ Contributions welcome. Open issues or PRs and include a short description and st
 
 ## License
 
-No license file detected in the repository — add a `LICENSE` if you want to define reuse terms.
+MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -362,7 +362,7 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 **Matimba Regent**
 - GitHub: [https://github.com/MatimbaMtileni](https://github.com/MatimbaMtileni)
-- LinkedIn: [Your LinkedIn Profile]
+
 
 ## 🤝 Contributing
 
